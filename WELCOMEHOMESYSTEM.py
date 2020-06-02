@@ -1,8 +1,4 @@
 
-MrMagoo Magoo <nickcrowle@gmail.com>
-11:57 PM (1 minute ago)
-to me
-
 from imutils import paths
 from imutils.video import VideoStream
 from imutils.video import FPS
