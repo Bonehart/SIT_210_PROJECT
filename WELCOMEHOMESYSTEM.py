@@ -1,3 +1,8 @@
+
+MrMagoo Magoo <nickcrowle@gmail.com>
+11:57 PM (1 minute ago)
+to me
+
 from imutils import paths
 from imutils.video import VideoStream
 from imutils.video import FPS
@@ -9,22 +14,22 @@ import os
 
 import imutils
 import time
-import paho.mqtt.client as mqtt 
+import paho.mqtt.client as mqtt
 
 users_file = open('users.pkl', 'rb')
 dic = pickle.load(users_file)
 users_file.close()
 
-ourClient = mqtt.Client("TEST") 
-ourClient.connect("test.mosquitto.org", 1883) 
-ourClient.loop_start() 
+ourClient = mqtt.Client("TEST")
+ourClient.connect("test.mosquitto.org", 1883)
+ourClient.loop_start()
 
 
 def runRoutines(name):
     for i in dic[name]:
         print(i)
         ourClient.publish("WELCOME_HOME", i)  
-        time.sleep(1) 
+        time.sleep(1)
 
 vs = VideoStream().start()
 
@@ -39,14 +44,14 @@ while True:
     #encodings require to know the location of the face to encode the actual face data
     frame = vs.read()
     frame = imutils.resize(frame, width=500)
-    
+   
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    
-    faceArea = detector.detectMultiScale(gray, scaleFactor=1.1, 
+   
+    faceArea = detector.detectMultiScale(gray, scaleFactor=1.1,
         minNeighbors=5, minSize=(30, 30),
         flags=cv2.CASCADE_SCALE_IMAGE)
-    
+   
     boxes = [(y, x + w, y + h, x) for (x, y, w, h) in faceArea]
 
     #thewse are encodings read by the camera we compare them to those saved in the pickle file
@@ -58,24 +63,22 @@ while True:
  
         matches = face_recognition.compare_faces(data["encodings"],encoding)
         name = "UNdefined"
-        
+       
         if(Matched== True):
             print("Your settings have been applied, welcome home", name)
             break
-        
+       
         #loop over all mathes and take action for the first one found if one is found the program breaks
         #this is because we don't want repeated things turning on and off
         if True in matches:
-            
-            matchedfaces = [i for (i, b) in enumerate(matches) if b]
-            counts = {}
+           
+            #matchedfaces = [i for (i, b) in enumerate(matches) if b]
+            #counts = {}
             Matched = True
 
-            for i in matchedfaces:
-                name = data["names"][i]
-                counts[name] = counts.get(name, 0) + 1
-
-            name = max(counts, key=counts.get)
+            #for i in matchedfaces:
+            name = data["names"][0]
+       
                                  
             print("welcome home ",name)
             print("actioning your welcome home settings")
@@ -83,14 +86,11 @@ while True:
             runRoutines(name)
                        
             break;
-        
-        # update the list of names
-        names.append(name)
 
     # standard code to display the image to our screen
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
-    
+   
     # if a matche was found tyhe program needs to end
     if(Matched==True):
         print("Your settings have been applied, welcome home", name)
@@ -104,4 +104,6 @@ while True:
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
+
+
 
